@@ -32,7 +32,7 @@ export const darkTheme = createTheme({
             main: '#CE8F2D',
             light: '#E2B978',
             dark: '#674817',
-            contrastText: '#ECCFA2'
+            contrastText: '#FFF'
 
         },
         secondary: {
