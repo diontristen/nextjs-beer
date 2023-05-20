@@ -13,7 +13,8 @@ const Login = () => {
 const LoginButton = styled(Button)(() => ({
     fontWeight: 600,
     marginLeft: '32px',
-    color: '#fff'
+    color: '#fff',
+    padding: '8px 32px'
 }))
 
 export default Login;

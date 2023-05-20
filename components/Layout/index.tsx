@@ -12,7 +12,7 @@ const Wrapper = styled(Box)(({ theme }) => ({
 }))
 
 const Component = styled('div')(() => ({
-    padding: '32px !important',
+    padding: '0 32px !important',
 }))
 
 const Layout = ({ children }: LayoutProps) => {

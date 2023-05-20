@@ -17,6 +17,13 @@ export const darkTheme = createTheme({
                     letterSpacing: '2px',
                 }
             }
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: '16px'
+                }
+            }
         }
     },
     palette: {

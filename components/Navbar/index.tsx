@@ -7,9 +7,11 @@ import Links from './Links';
 
 const Wrapper = styled(AppBar)(() => ({
     alignItems: 'center',
-    background: 'transparent',
     boxShadow: 'none',
     padding: '32px 0px',
+    height: '100px',
+    background: 'rgba(49, 47, 52, 0.8)',
+    backdropFilter: 'blur(62.5px)',
 }))
 
 const Container = styled(Toolbar)(() => ({
