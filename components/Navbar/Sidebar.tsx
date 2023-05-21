@@ -20,6 +20,11 @@ const ROUTES: Route[] = [
         label: 'Beers',
         link: '/beers',
         key: 'route-beers'
+    },
+    {
+        label: 'Collection',
+        link: '/collection',
+        key: 'route-collection'
     }
 ]
 

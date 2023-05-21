@@ -4,7 +4,7 @@ import { AppBar, Box, Toolbar } from '@mui/material';
 import Login from '../Login';
 import Image from 'next/image';
 import Links from './Links';
-
+import { useRouter } from 'next/router';
 const Wrapper = styled(AppBar)(() => ({
     alignItems: 'center',
     boxShadow: 'none',
@@ -20,10 +20,13 @@ const Container = styled(Toolbar)(() => ({
 
 
 const Navbar = () => {
+    const router = useRouter()
     return (
         <Wrapper position='sticky'>
             <Container>
-                <Box sx={{ cursor: 'pointer', flex: 1 }}>
+                <Box
+                onClick={(() => router.push('/'))}
+                sx={{ cursor: 'pointer', flex: 1 }}>
                     <Image
                         src='/assets/logo/ibp-logx.png'
                         alt="Internation Beer Pub Logo"

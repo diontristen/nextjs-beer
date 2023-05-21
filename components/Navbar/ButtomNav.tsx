@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import { Home, SportsBar, Menu } from '@mui/icons-material';
+import { AllinBox, SportsBar, Menu } from '@mui/icons-material';
 import { styled } from '@mui/system';
 import { useRouter } from 'next/router';
 import Sidebar from './Sidebar';
@@ -35,7 +35,7 @@ export default function ButtomNav() {
           setRoute(newValue);
         }}
       >
-        <BottomNavigationAction href='/' label="Home" icon={<Home />} />
+        <BottomNavigationAction href='/' label="Collection" icon={<AllinBox />} />
         <BottomNavigationAction href='/beers' label="Beers" icon={<SportsBar />} />
         <BottomNavigationAction onClick={() => toggleDrawer(true)} label="More" icon={<Menu />} />
       </Container>
