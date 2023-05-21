@@ -12,7 +12,10 @@ const nextConfig = {
     "@mui/styles": {
       transform: "@mui/styles/{{member}}",
     },
-  }
+  },
+  images: {
+    domains: ['images.punkapi.com'],
+  },
 }
 
 module.exports = nextConfig;

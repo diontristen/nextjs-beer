@@ -1,11 +1,314 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Divider, useMediaQuery, Button } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import { styled } from '@mui/system';
+import InfiniteLoader from "react-window-infinite-loader";
+import {
+    FixedSizeGrid as Grid,
+    GridProps,
+} from 'react-window';
+import AutoSizer from "react-virtualized-auto-sizer";
+import Image from 'next/image'
 import Layout from '../../components/Layout';
+import axios from '../../config/axios.config';
+
+const ROW_HEIGHT = 400
+
 const Beers = () => {
     return (
         <Layout>
-            Beers
+            <Typography
+                variant="h2"
+                sx={{
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    marginBottom: '24px',
+                }}
+            >
+                Punk Beers
+            </Typography>
+            <Typography
+                variant="h6"
+                sx={{
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    marginBottom: '24px',
+                }}
+            >
+                Choose. Click. Collect
+            </Typography>
+            <Divider sx={{ margin: '16px auto', width: '80%' }} variant="middle" />
+            <ListWrapper />
         </Layout>
     );
 };
 
 export default Beers;
+
+
+const ListWrapper = () => {
+
+    const [loadedItemsState, setLoadedItemsState] = useState<{
+        hasNextPage: boolean
+        items: any[],
+        page: number
+    }>({
+        hasNextPage: true,
+        items: [],
+        page: 0
+    })
+
+    const [scrollState, setScrollState] = useState({
+        rowIndex: 0,
+        columnIndex: 0
+    })
+
+
+    const loadMoreItems = async (startIndex: number, stopIndex: number) => {
+        const page = loadedItemsState.page + 1
+        const result = await axios.get(`/beers?page=${page}`)
+        const data = result?.data ?? []
+        setLoadedItemsState({
+            hasNextPage: data?.length === 24,
+            items: [...loadedItemsState.items, ...data],
+            page
+        });
+    };
+
+    const setScrollRowAndColum = React.useCallback((rowIndex: number, columnIndex: number) => {
+        setScrollState({ rowIndex, columnIndex })
+    }, [])
+
+    const { hasNextPage, items } = loadedItemsState;
+
+    return (
+        <List
+            hasNextPage={hasNextPage}
+            items={items}
+            loadMoreItems={loadMoreItems}
+            scrollState={scrollState}
+            setScrollRowAndColumn={setScrollRowAndColum}
+        />
+    )
+}
+
+interface ListProps {
+    hasNextPage: boolean,
+    items: any[],
+    loadMoreItems: (startIndex: number, stopIndex: number) => Promise<any>
+    scrollState: {
+        rowIndex: number,
+        columnIndex: number
+    }
+    setScrollRowAndColumn: (rowIndex: number, columnIndex: number) => void
+}
+
+interface BeerItem {
+    id: number
+    name: string
+    image_url: string
+    blurDataUrl: string
+    abv: number
+    tagline: string
+}
+
+interface BeerInterface {
+    columnIndex: number
+    rowIndex: number
+    style: React.CSSProperties,
+    data: ItemData
+}
+
+interface ItemData {
+    isItemLoaded: (index: number) => boolean
+    items: BeerItem[],
+}
+
+const List = ({
+    hasNextPage,
+    items,
+    loadMoreItems,
+    scrollState,
+    setScrollRowAndColumn
+}: ListProps) => {
+    const theme = useTheme()
+    const mdQuery = useMediaQuery(theme.breakpoints.down('md'));
+    const smQuery = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const columnCount: number = smQuery ? 1 : mdQuery ? 2 : 4
+    const rowCount: number = items?.length / columnCount ?? 0
+    const itemCount: number = hasNextPage ? rowCount + 1 : rowCount;
+
+    const isItemLoaded = (index: number) => !hasNextPage || !!items[index * columnCount]
+
+    const itemData: ItemData = useMemo(() => ({
+        isItemLoaded,
+        items
+
+    }), [isItemLoaded, items])
+    const Item: GridProps["children"] = ({ columnIndex, rowIndex, style, data }: BeerInterface) => {
+        const beer = data?.items[rowIndex * (columnCount === 4 ? 3 : columnCount) + columnIndex] ?? undefined
+        if (!beer) {
+            return <div style={style}>LOADING</div>;
+        }
+        return (
+            <BeerItemContainer
+                key={`beer-${beer?.id}`}
+                style={style}
+            >
+                <BeerContainer>
+                    <Typography
+                        variant="subtitle2"
+                        sx={{
+                            fontWeight: 700,
+                            color: 'primary.main',
+                            fontSize: '24px',
+                            marginBottom: '12px',
+                            textAlign: 'center',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: '2',
+                            WebkitBoxOrient: 'vertical',
+                        }}
+                    >
+                        {beer?.name}
+                    </Typography>
+                    <Box
+                        sx={{
+                            position: 'relative',
+                            width: 'auto',
+                            height: 170,
+                            flex: 1,
+                            '>img': {
+                                width: 'auto !important',
+                                margin: 'auto'
+                            }
+                        }}
+                    >
+                        <Image
+                            src={beer?.image_url}
+                            alt="Beer Image"
+                            fill={true}
+                            loading='lazy'
+                            placeholder='blur'
+                            blurDataURL={beer?.blurDataUrl ?? ''}
+                            style={{
+                                objectFit: 'contain'
+                            }}
+                        />
+                    </Box>
+                    <Divider sx={{ margin: '16px auto', width: '80%' }} variant="middle" />
+                    <Typography
+                        variant="subtitle2"
+                        sx={{
+                            textAlign: 'center',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: '2',
+                            WebkitBoxOrient: 'vertical',
+                        }}
+                    >
+                        {beer?.tagline}
+                    </Typography>
+                    <Typography
+                        variant="subtitle2"
+                        color='primary.light'
+                        sx={{
+                            textAlign: 'center'
+                        }}
+                    >
+                        {beer?.abv} %
+                    </Typography>
+                </BeerContainer>
+            </BeerItemContainer>
+        )
+    };
+
+    return (
+        <AutoSizer
+            style={{
+                height: '100%',
+                width: '100%'
+            }}
+        >
+            {({ _, width }) => (
+                <InfiniteLoader
+                    isItemLoaded={isItemLoaded}
+                    itemCount={itemCount}
+                    loadMoreItems={loadMoreItems}
+                >
+                    {({ onItemsRendered, ref }) => (
+                        <Grid
+                            height={(ROW_HEIGHT * 2 + 50)}
+                            width={width ? width + 24 : 24}
+                            rowHeight={ROW_HEIGHT}
+                            columnWidth={(width ?? 0) / columnCount}
+                            rowCount={itemCount}
+                            columnCount={columnCount}
+                            itemData={itemData}
+                            initialScrollTop={ROW_HEIGHT * scrollState.rowIndex}
+                            onItemsRendered={({
+                                visibleRowStartIndex,
+                                visibleColumnStartIndex,
+                                visibleRowStopIndex,
+                                overscanRowStopIndex,
+                                overscanRowStartIndex,
+                            }) => {
+                                setScrollRowAndColumn(visibleRowStartIndex, visibleColumnStartIndex)
+                                onItemsRendered({
+                                    overscanStartIndex: overscanRowStartIndex,
+                                    overscanStopIndex: overscanRowStopIndex,
+                                    visibleStartIndex: visibleRowStartIndex,
+                                    visibleStopIndex: visibleRowStopIndex
+                                });
+                            }}
+                            ref={ref}
+                        >
+
+                            {Item}
+                        </Grid>
+                    )}
+                </InfiniteLoader>
+            )}
+        </AutoSizer>
+    )
+}
+
+const BeerItemContainer = styled(Box)(({ theme }) => ({
+    padding: '8px'
+}))
+
+const BeerContainer = styled(Box)(({ theme }) => ({
+    background: 'rgba(255, 255, 255, 0.05)',
+    boxShadow: '0 0 10px 1px rgba(0, 0, 0, 0.25)',
+    backdropFilter: 'blur(2px)',
+    border: '1px solid rgba(255, 255, 255, .05)',
+    borderRadius: '16px',
+    padding: '16px 8px',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    cursor: 'pointer',
+    ':hover': {
+        background: 'rgba(255, 255, 255, 0.2)',
+        'img': {
+            animation: `shake 1s ease-in`
+        }
+    },
+    "@keyframes shake": {
+        "0%, 40%, 90": {
+            transform: "translate(1px, 1px) rotate(0deg)"
+        },
+        "10%, 50%, 100%": {
+            transform: "translate(-1px, -2px) rotate(-1deg)"
+        },
+        "20%, 60%": {
+            transform: "translate(-3px, 0px) rotate(1deg)"
+        },
+        "30%, 70%": {
+            transform: "translate(3px, 2px) rotate(0deg)"
+        },
+    },
+}))

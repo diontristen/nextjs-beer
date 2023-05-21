@@ -45,7 +45,7 @@ const Login = () => {
                         <Typography textAlign="center">{user?.name}</Typography>
                     </MenuItem>
                     <MenuItem
-                        key="name"
+                        key="collection"
                     >
                         <Typography textAlign="center">Collection</Typography>
                     </MenuItem>
