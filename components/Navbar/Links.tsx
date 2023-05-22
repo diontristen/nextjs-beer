@@ -3,23 +3,33 @@ import { Box } from '@mui/material';
 import Link from 'next/link';
 import { styled } from '@mui/system';
 import { useRouter } from 'next/router';
+import { useSession } from "next-auth/react";
 
 export interface Route {
-    label: string;
-    link: string;
-    key: string;
+    label: string
+    link: string
+    key: string
+    private: boolean
 }
 
 const ROUTES: Route[] = [
     {
         label: 'About Us',
         link: '/about',
-        key: 'route-about'
+        key: 'route-about',
+        private: false
     },
     {
         label: 'Beers',
         link: '/beers',
-        key: 'route-beers'
+        key: 'route-beers',
+        private: false
+    },
+    {
+        label: 'Collections',
+        link: '/collections',
+        key: 'route-collections',
+        private: true
     }
 ]
 
@@ -44,6 +54,7 @@ const RouteLink = styled(Link)(({ theme }) => ({
 
 const Links = () => {
     const router = useRouter();
+    const { data: session } = useSession()
     const pathname = router.pathname
 
     return (
@@ -52,6 +63,7 @@ const Links = () => {
                 <RouteLink 
                 sx={{
                     textDecoration:  pathname === route.link ? 'underlined' : 'none',
+                    display: route.private ? session ? 'display' : 'none' : 'display'
                 }}
                 href={route.link} 
                 key={route.key}>

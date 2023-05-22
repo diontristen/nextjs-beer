@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Box, Typography, Divider, useMediaQuery, Chip } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/system';
@@ -10,13 +10,13 @@ import {
 import AutoSizer from "react-virtualized-auto-sizer";
 import Image from 'next/image'
 import { useDispatch, useSelector } from 'react-redux';
-import Layout from '../../components/Layout';
-import axios from '../../config/axios.config';
-import { addCartItem, selectsCartItems, selectsCollections } from '../../store/collectionSlice';
+import Layout from '../components/Layout';
+import axios from '../config/axios.config';
+import { addCartItem, selectsCartItems, selectsCollections } from '../store/collectionSlice';
 
 const ROW_HEIGHT = 400
 
-const Beers = () => {
+const Collections = () => {
     return (
         <Layout>
             <Typography
@@ -27,7 +27,7 @@ const Beers = () => {
                     marginBottom: '24px',
                 }}
             >
-                Punk Beers
+                Collections
             </Typography>
             <Typography
                 variant="h6"
@@ -37,7 +37,7 @@ const Beers = () => {
                     marginBottom: '24px',
                 }}
             >
-                Choose. Click. Collect
+                Let your eyes be amazed.
             </Typography>
             <Divider sx={{ margin: '16px auto', width: '80%' }} variant="middle" />
             <ListWrapper />
@@ -45,19 +45,18 @@ const Beers = () => {
     );
 };
 
-export default Beers;
+export default Collections;
 
 
 const ListWrapper = () => {
+    const collectionItems = useSelector(selectsCollections) ?? []
 
     const [loadedItemsState, setLoadedItemsState] = useState<{
         hasNextPage: boolean
-        items: any[],
-        page: number
+        items: any[]
     }>({
         hasNextPage: true,
-        items: [],
-        page: 0
+        items: []
     })
 
     const [scrollState, setScrollState] = useState({
@@ -65,17 +64,28 @@ const ListWrapper = () => {
         columnIndex: 0
     })
 
+    const loadMoreItems = async (startIndex?: number = 0, stopIndex?: number = 0) => {
+        const previousItem = loadedItemsState?.items[loadedItemsState?.items?.length - 1] ?? null;
+        const previousItemIndex = collectionItems.findIndex(item => item?.id === previousItem?.id)
+    
+        const nextItems = collectionItems.slice(
+          previousItemIndex >= 0 ? previousItemIndex + 1 : 0,
+            24
+        );
+     
+        const newItems = [...loadedItemsState.items, ...nextItems];
 
-    const loadMoreItems = async (startIndex: number, stopIndex: number) => {
-        const page = loadedItemsState.page + 1
-        const result = await axios.get(`/beers?page=${page}`)
-        const data = result?.data ?? []
         setLoadedItemsState({
-            hasNextPage: data?.length === 24,
-            items: [...loadedItemsState.items, ...data],
-            page
+            hasNextPage: newItems.length < collectionItems.length,
+            items: newItems,
         });
     };
+
+    useEffect(() => {
+        if (collectionItems && !hasNextPage) {
+            loadMoreItems()
+        }
+    }, [collectionItems])
 
     const setScrollRowAndColum = React.useCallback((rowIndex: number, columnIndex: number) => {
         setScrollState({ rowIndex, columnIndex })
@@ -140,7 +150,7 @@ const List = ({
     const smQuery = useMediaQuery(theme.breakpoints.down('sm'));
 
     const columnCount: number = smQuery ? 1 : mdQuery ? 2 : 4
-    const rowCount: number = items?.length / columnCount ?? 0
+    const rowCount: number = Math.ceil(items?.length / columnCount) ?? 0
     const itemCount: number = hasNextPage ? rowCount + 1 : rowCount;
     const cartItems = useSelector(selectsCartItems) ?? []
     const collectionItems = useSelector(selectsCollections) ?? []
@@ -153,6 +163,7 @@ const List = ({
 
     }), [isItemLoaded, items])
 
+
     const addToCart = (beer: BeerItem) => {
         dispatch(addCartItem({ beer }))
     }
@@ -162,7 +173,7 @@ const List = ({
         const existingInCart = cartItems.some((item) => item?.id === beer?.id) ?? false
         const existingInCollections = collectionItems.some((item) => item?.id === beer?.id) ?? false
         if (!beer) {
-            return <div style={style}>LOADING</div>;
+            return <div style={style}></div>;
         }
         return (
             <BeerItemContainer
@@ -236,7 +247,7 @@ const List = ({
                         {beer?.abv} %
                     </Typography>
                     <Box sx={{ textAlign: 'center' }}>
-                        {(existingInCart || existingInCollections) && <Chip
+                        {existingInCart || existingInCollections && <Chip
                             size="small"
                             label={existingInCollections ? 'Collected' : 'In Cart'} color="primary" />}
                     </Box>
