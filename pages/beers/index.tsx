@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Layout from '../../components/Layout';
 import axios from '../../config/axios.config';
 import { addCartItem, selectsCartItems, selectsCollections } from '../../store/collectionSlice';
+import { useSession } from "next-auth/react";
 
 const ROW_HEIGHT = 400
 
@@ -138,6 +139,7 @@ const List = ({
     const theme = useTheme()
     const mdQuery = useMediaQuery(theme.breakpoints.down('md'));
     const smQuery = useMediaQuery(theme.breakpoints.down('sm'));
+    const { data: session } = useSession()
 
     const columnCount: number = smQuery ? 1 : mdQuery ? 2 : 4
     const rowCount: number = items?.length / columnCount ?? 0
@@ -154,7 +156,9 @@ const List = ({
     }), [isItemLoaded, items])
 
     const addToCart = (beer: BeerItem) => {
-        dispatch(addCartItem({ beer }))
+        if (session) {
+            dispatch(addCartItem({ beer }))
+        }
     }
 
     const Item: GridProps["children"] = ({ columnIndex, rowIndex, style, data }: BeerInterface) => {
