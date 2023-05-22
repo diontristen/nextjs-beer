@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Divider, useMediaQuery, Button } from '@mui/material'
+import { Box, Typography, Divider, useMediaQuery, Chip } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { styled } from '@mui/system';
 import InfiniteLoader from "react-window-infinite-loader";
@@ -9,8 +9,10 @@ import {
 } from 'react-window';
 import AutoSizer from "react-virtualized-auto-sizer";
 import Image from 'next/image'
+import { useDispatch, useSelector } from 'react-redux';
 import Layout from '../../components/Layout';
 import axios from '../../config/axios.config';
+import { addCartItem, selectsCartItems, selectsCollections } from '../../store/collectionSlice';
 
 const ROW_HEIGHT = 400
 
@@ -103,13 +105,14 @@ interface ListProps {
     setScrollRowAndColumn: (rowIndex: number, columnIndex: number) => void
 }
 
-interface BeerItem {
+export interface BeerItem {
     id: number
     name: string
     image_url: string
     blurDataUrl: string
     abv: number
     tagline: string
+    contributed_by: string
 }
 
 interface BeerInterface {
@@ -131,6 +134,7 @@ const List = ({
     scrollState,
     setScrollRowAndColumn
 }: ListProps) => {
+    const dispatch = useDispatch()
     const theme = useTheme()
     const mdQuery = useMediaQuery(theme.breakpoints.down('md'));
     const smQuery = useMediaQuery(theme.breakpoints.down('sm'));
@@ -138,6 +142,8 @@ const List = ({
     const columnCount: number = smQuery ? 1 : mdQuery ? 2 : 4
     const rowCount: number = items?.length / columnCount ?? 0
     const itemCount: number = hasNextPage ? rowCount + 1 : rowCount;
+    const cartItems = useSelector(selectsCartItems) ?? []
+    const collectionItems = useSelector(selectsCollections) ?? []
 
     const isItemLoaded = (index: number) => !hasNextPage || !!items[index * columnCount]
 
@@ -146,8 +152,15 @@ const List = ({
         items
 
     }), [isItemLoaded, items])
+
+    const addToCart = (beer: BeerItem) => {
+        dispatch(addCartItem({ beer }))
+    }
+
     const Item: GridProps["children"] = ({ columnIndex, rowIndex, style, data }: BeerInterface) => {
-        const beer = data?.items[rowIndex * (columnCount === 4 ? 3 : columnCount) + columnIndex] ?? undefined
+        const beer = data?.items[rowIndex * (columnCount) + columnIndex] ?? undefined
+        const existingInCart = cartItems.some((item) => item?.id === beer?.id) ?? false
+        const existingInCollections = collectionItems.some((item) => item?.id === beer?.id) ?? false
         if (!beer) {
             return <div style={style}>LOADING</div>;
         }
@@ -155,6 +168,7 @@ const List = ({
             <BeerItemContainer
                 key={`beer-${beer?.id}`}
                 style={style}
+                onClick={() => addToCart(beer)}
             >
                 <BeerContainer>
                     <Typography
@@ -221,6 +235,11 @@ const List = ({
                     >
                         {beer?.abv} %
                     </Typography>
+                    <Box sx={{ textAlign: 'center' }}>
+                        {existingInCart || existingInCollections && <Chip
+                            size="small"
+                            label={existingInCollections ? 'Collected' : 'In Cart'} color="primary" />}
+                    </Box>
                 </BeerContainer>
             </BeerItemContainer>
         )

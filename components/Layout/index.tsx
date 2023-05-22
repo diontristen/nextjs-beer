@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { styled } from '@mui/system';
 import Navbar from '../Navbar';
 import ButtomNav from '../Navbar/ButtomNav';
+import SidebarCollection from '../Collections/SidebarCollection';
 interface LayoutProps {
     children?: React.ReactNode;
 }
@@ -19,6 +20,7 @@ const Layout = ({ children }: LayoutProps) => {
     return (
         <Wrapper>
             <Navbar />
+            <SidebarCollection />
             <Component>
                 {children}
             </Component>
