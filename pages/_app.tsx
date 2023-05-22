@@ -10,6 +10,8 @@ import '@fontsource/oswald/400.css';
 import '@fontsource/oswald/500.css';
 import '@fontsource/oswald/700.css';
 import { darkTheme } from '../styles/theme/darkTheme';
+import { wrapper } from '../store/store';
+
 const clientSideEmotionCache = createEmotionCache()
 
 export interface CustomProps extends AppProps {
@@ -30,4 +32,4 @@ function MyApp({ Component, pageProps: { session, ...pageProps}, emotionCache = 
   </SessionProvider>
 }
 
-export default MyApp
+export default wrapper.withRedux(MyApp);
