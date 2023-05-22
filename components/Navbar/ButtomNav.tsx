@@ -26,17 +26,23 @@ export default function ButtomNav() {
   const initRoute = pathname === '/' ? 0 : pathname === '/beers' ? 1 : 2
   const [route, setRoute] = useState(initRoute);
   const [drawer, toggleDrawer] = useState(false);
+
+  const goTo = (link: string) => {
+    router.push(link)
+  }
+
   return (
     <Wrapper>
       <Container
         showLabels
         value={route}
         onChange={(_, newValue) => {
+          console.log(newValue)
           setRoute(newValue);
         }}
       >
-        <BottomNavigationAction href='/' label="Collection" icon={<AllinBox />} />
-        <BottomNavigationAction href='/beers' label="Beers" icon={<SportsBar />} />
+        <BottomNavigationAction onClick={() => goTo('/collections')} label="Collection" icon={<AllinBox />} />
+        <BottomNavigationAction onClick={() => goTo('/beers')} label="Beers" icon={<SportsBar />} />
         <BottomNavigationAction onClick={() => toggleDrawer(true)} label="More" icon={<Menu />} />
       </Container>
       <Sidebar drawer={drawer} toggleDrawer={toggleDrawer} />

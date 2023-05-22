@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Layout from '../components/Layout';
 import axios from '../config/axios.config';
 import { addCartItem, selectsCartItems, selectsCollections } from '../store/collectionSlice';
+import { GetSessionParams, getSession } from 'next-auth/react';
 
 const ROW_HEIGHT = 400
 
@@ -342,3 +343,20 @@ const BeerContainer = styled(Box)(({ theme }) => ({
         },
     },
 }))
+
+export async function getServerSideProps(context: GetSessionParams | undefined) {
+    const session = await getSession(context)
+  
+    if (!session) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      }
+    }
+  
+    return {
+      props: { session }
+    }
+  }

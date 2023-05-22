@@ -105,7 +105,7 @@ const Home: NextPage = () => {
               About Us
             </Button>
             <Button
-              href="/products"
+              href="/beers"
               variant="contained">
               Products
             </Button>
