@@ -3,6 +3,7 @@ import { Drawer, Box, IconButton } from '@mui/material';
 import { styled } from '@mui/system';
 import Link from 'next/link';
 import { Close } from '@mui/icons-material';
+import { useSession } from "next-auth/react";
 import { Route } from './Links';
 
 interface SidebarProps {
@@ -14,17 +15,20 @@ const ROUTES: Route[] = [
     {
         label: 'About Us',
         link: '/about',
-        key: 'route-about'
+        key: 'route-about',
+        private: false
     },
     {
         label: 'Beers',
         link: '/beers',
-        key: 'route-beers'
+        key: 'route-beers',
+        private: false
     },
     {
         label: 'Collection',
         link: '/collection',
-        key: 'route-collection'
+        key: 'route-collection',
+        private: true
     }
 ]
 
@@ -46,6 +50,7 @@ const RouteLink = styled(Link)(({ theme }) => ({
 }))
 
 const Sidebar = ({ drawer, toggleDrawer }: SidebarProps) => {
+    const { data: session } = useSession()
     const onClose = () => {
         toggleDrawer(false)
     }
@@ -59,7 +64,7 @@ const Sidebar = ({ drawer, toggleDrawer }: SidebarProps) => {
             sx={{
             }}
         >
-            <Box sx={{ textAlign: 'right'}}>
+            <Box sx={{ textAlign: 'right' }}>
                 <IconButton
                     onClick={onClose}
                 >
@@ -68,7 +73,12 @@ const Sidebar = ({ drawer, toggleDrawer }: SidebarProps) => {
             </Box>
             <LinkContainer>
                 {ROUTES.map((route) => (
-                    <RouteLink href={route.link} key={route.key}>
+                    <RouteLink
+                        sx={{
+                            display: route.private ? session ? 'display' : 'none' : 'display'
+                        }}
+                        href={route.link}
+                        key={route.key}>
                         {route.label}
                     </RouteLink>
                 ))}

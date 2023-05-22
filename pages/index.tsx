@@ -2,7 +2,9 @@ import type { NextPage } from 'next'
 import { styled } from '@mui/system';
 import { Box, Typography, Button } from '@mui/material';
 import Image from 'next/image';
+import { useTheme } from '@mui/material/styles'
 import Layout from '../components/Layout'
+
 
 const HeroContainer = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -40,16 +42,6 @@ const HeroImageContainer = styled('div')(() => ({
   alignItems: 'center',
 }))
 
-const HeroTitle = styled(Typography)(({ theme }) => ({
-  fontWeight: 500,
-  [theme.breakpoints.down('lg')]: {
-    fontSize: '64px'
-  },
-  [theme.breakpoints.down('md')]: {
-    fontSize: '48px'
-  },
-}))
-
 const HeroSubtitle = styled(Typography)(({ theme }) => ({
   fontSize: '24px',
   [theme.breakpoints.down('lg')]: {
@@ -74,27 +66,45 @@ const ButtonContainer = styled(Box)(({ theme }) => ({
 }))
 
 const Home: NextPage = () => {
+  const theme = useTheme()
+
   return (
     <Layout>
       <HeroContainer>
         <HeroContentContainer>
-          <HeroTitle
+          <Typography
             variant="h1"
             gutterBottom
+            sx={{
+              fontWeight: 500,
+              [theme.breakpoints.down('lg')]: {
+                fontSize: '64px'
+              },
+              [theme.breakpoints.down('md')]: {
+                fontSize: '48px'
+              },
+            }}
           >
-            <HeroTitle
+            <Typography
               variant="h1"
               color="primary.main"
               sx={{
                 marginRight: '16px',
+                fontWeight: 500,
+                [theme.breakpoints.down('lg')]: {
+                  fontSize: '64px'
+                },
+                [theme.breakpoints.down('md')]: {
+                  fontSize: '48px'
+                },
               }}
               gutterBottom
               component='span'
             >
               Punk Drinks
-            </HeroTitle>
+            </Typography>
             for every moment.
-          </HeroTitle>
+          </Typography>
           <HeroSubtitle variant="subtitle1" gutterBottom>
             Beer Pub® is a trusted craft beer and spirits marketplace designed to make every online drink purchase convenient, fast, and reliable.
           </HeroSubtitle>

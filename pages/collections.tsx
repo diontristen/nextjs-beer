@@ -65,7 +65,7 @@ const ListWrapper = () => {
         columnIndex: 0
     })
 
-    const loadMoreItems = async (startIndex?: number = 0, stopIndex?: number = 0) => {
+    const loadMoreItems = async (startIndex: number = 0, stopIndex: number = 0) => {
         const previousItem = loadedItemsState?.items[loadedItemsState?.items?.length - 1] ?? null;
         const previousItemIndex = collectionItems.findIndex(item => item?.id === previousItem?.id)
     
@@ -264,7 +264,7 @@ const List = ({
                 width: '100%'
             }}
         >
-            {({ _, width }) => (
+            {({ width }) => (
                 <InfiniteLoader
                     isItemLoaded={isItemLoaded}
                     itemCount={itemCount}

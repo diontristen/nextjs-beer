@@ -2,28 +2,47 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import Image from 'next/image';
 import { styled } from '@mui/system';
+import { useTheme } from '@mui/material/styles'
 
 const AboutHero = () => {
+    const theme = useTheme()
+
     return (
         <HeroContainer>
             <HeroContentContainer>
-                <HeroTitle
+                <Typography
                     variant="h1"
                     gutterBottom
+                    sx={{
+                        fontWeight: 500,
+                        [theme.breakpoints.down('lg')]: {
+                            fontSize: '64px'
+                        },
+                        [theme.breakpoints.down('md')]: {
+                            fontSize: '48px'
+                        },
+                    }}
                 >
-                    <HeroTitle
+                    <Typography
                         variant="h1"
                         color="primary.main"
                         sx={{
                             marginRight: '16px',
+                            fontWeight: 500,
+                            [theme.breakpoints.down('lg')]: {
+                                fontSize: '64px'
+                            },
+                            [theme.breakpoints.down('md')]: {
+                                fontSize: '48px'
+                            },
                         }}
                         gutterBottom
                         component='span'
                     >
                         Punk Beer
-                    </HeroTitle>
+                    </Typography>
                     Team.
-                </HeroTitle>
+                </Typography>
                 <HeroSubtitle variant="subtitle1" gutterBottom>
                     Beer Pub started as a simple text from one friend to another: “Why can't you get alcohol delivered?" When we realized that alcohol delivery was, in fact, legal, we set out with a little bit of luck and a lotta bit of determination to build a three-tier compliant technology company that would change the way we shop for punk beers.
                 </HeroSubtitle>
@@ -85,16 +104,6 @@ const HeroContentContainer = styled('div')(({ theme }) => ({
     [theme.breakpoints.down('md')]: {
         textAlign: 'center',
         paddingRight: '0',
-    },
-}))
-
-const HeroTitle = styled(Typography)(({ theme }) => ({
-    fontWeight: 500,
-    [theme.breakpoints.down('lg')]: {
-        fontSize: '64px'
-    },
-    [theme.breakpoints.down('md')]: {
-        fontSize: '48px'
     },
 }))
 

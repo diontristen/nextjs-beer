@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios"
 import { getPlaiceholder } from "plaiceholder";
+import { BeerItem } from "../../beers";
 const PUNK_BEER_API = 'https://api.punkapi.com/v2/beers'
 const ITEM_PER_PAGE = 24
 
@@ -28,7 +29,7 @@ const getBeers = async (req: GetBeersRequest, res: NextApiResponse) => {
         const result = await axios.get(URL)
         if (result.status === 200) {
             const data = result?.data ?? []
-            const newData = await Promise.all(data.map(async (item) => {
+            const newData = await Promise.all(data.map(async (item: BeerItem) => {
                 const { base64 } = await getPlaiceholder(item?.image_url);
                 return {
                     ...item,
@@ -37,7 +38,7 @@ const getBeers = async (req: GetBeersRequest, res: NextApiResponse) => {
             }))
             res.status(200).json(newData)
         }
-    } catch (error) {
+    } catch (error: any) {
         const errorMessage = error?.detail || error?.message || 'Failed to fetch data'
         res.status(500).json({ error: errorMessage })
     }

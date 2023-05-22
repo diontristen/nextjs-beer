@@ -252,7 +252,7 @@ const List = ({
                 width: '100%'
             }}
         >
-            {({ _, width }) => (
+            {({ width }) => (
                 <InfiniteLoader
                     isItemLoaded={isItemLoaded}
                     itemCount={itemCount}

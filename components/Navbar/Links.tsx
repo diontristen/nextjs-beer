@@ -9,7 +9,7 @@ export interface Route {
     label: string
     link: string
     key: string
-    private: boolean
+    private?: boolean
 }
 
 const ROUTES: Route[] = [
